@@ -170,7 +170,7 @@
     margin: 0 0 2px;
   }
   .fieldnote .place { color: var(--muted); font-size: .9rem; margin: 0 0 14px; }
-  .fieldnote .note-body { font-size: 1.05rem; line-height: 1.55; }
+  .fieldnote .note-body { font-size: 1.05rem; line-height: 1.55; white-space: pre-line; }
   .fieldnote .closing { font-style: italic; color: var(--text); margin: 16px 0 4px; font-family: 'Cormorant', serif; font-size: 1.1rem; }
   .fieldnote .sig { color: var(--muted); font-size: .9rem; margin: 0; }
 
@@ -183,7 +183,7 @@
     padding: 14px 0 4px;
   }
   .log-entry .who { font-size: .84rem; color: var(--muted); margin: 0 0 4px; }
-  .log-entry .msg { margin: 0 0 6px; }
+  .log-entry .msg { margin: 0 0 6px; white-space: pre-line; }
 
   /* -------- Lookup / history list -------- */
   .trail { margin: 8px 0 24px; }
@@ -279,11 +279,6 @@
 
     <hr class="rule">
 
-    <div id="logging-as" class="banner" style="display:none;">
-      Logging this find as <span class="name" id="logging-as-name"></span>.
-      <button type="button" class="textlink" id="clear-identity">Not you? Log as someone new</button>
-    </div>
-
     <form id="find-form" novalidate>
       <div class="field">
         <label for="stickerCode">Sticker code</label>
@@ -306,7 +301,11 @@
           <span>Post this unsigned — show it as “A Finder” instead of my Given Name.</span>
         </label>
       </div>
-      <input type="hidden" id="givenName" name="givenName" value="">
+      <div class="field">
+        <label for="givenName">Already a Finder? Enter your Given Name <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <input type="text" id="givenName" name="givenName" placeholder="e.g. Quiet Tide" autocomplete="off">
+        <p class="helper">First time? Leave this blank — the Keeper will name you.</p>
+      </div>
       <button type="submit" id="log-btn">Log my find</button>
       <p class="error-msg" id="find-error"></p>
     </form>
@@ -459,9 +458,6 @@ function nextRankInfo(totalFinds, rank) {
    --------------------------------------------------------------------------- */
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => (
-  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
-));
 
 function show(id) {
   $$('section').forEach(s => s.classList.remove('active'));
@@ -488,53 +484,63 @@ async function apiPost(payload) {
 /* Holds the most recent find, so the card + share buttons can read it. */
 let lastContext = null;
 
+/* Build a DOM element with a class and (safely-set) text — user text always
+   goes through textContent, never innerHTML, to prevent stored XSS. */
+function el(tag, className, text) {
+  const n = document.createElement(tag);
+  if (className) n.className = className;
+  if (text != null) n.textContent = text; // safe: no HTML parsing
+  return n;
+}
+
 /* ---------------------------------------------------------------------------
    Field Note block builder (visually distinct — the Keeper's note about place)
+   Returns a DOM node; all user/Keeper text set via textContent.
    --------------------------------------------------------------------------- */
 function renderFieldNote(note, city, country) {
   const isFerrymanAuthored = note.source === 'sticker' &&
     note.writtenBy && note.writtenBy.toLowerCase() !== 'keeper';
   const header = isFerrymanAuthored
-    ? 'Field Notes from ' + esc(note.writtenBy) + ', Ferryman'
+    ? 'Field Notes from ' + note.writtenBy + ', Ferryman'
     : 'Field Notes from the Keeper';
   const signature = isFerrymanAuthored
-    ? '— ' + esc(note.writtenBy) + ', Ferryman'
+    ? '— ' + note.writtenBy + ', Ferryman'
     : '— The Keeper';
-  const place = [city, country].filter(Boolean).map(esc).join(', ');
+  const place = [city, country].filter(Boolean).join(', ');
 
-  return '' +
-    '<div class="fieldnote">' +
-      '<div class="kicker">' + header + '</div>' +
-      (place ? '<div class="place">' + place + '</div>' : '') +
-      '<div class="note-body">' + esc(note.noteText).replace(/\n/g, '<br>') + '</div>' +
-      '<p class="closing">Look closely. Leave gently. Light the way.</p>' +
-      '<p class="sig">' + signature + '</p>' +
-    '</div>';
+  const box = el('div', 'fieldnote');
+  box.appendChild(el('div', 'kicker', header));
+  if (place) box.appendChild(el('div', 'place', place));
+  box.appendChild(el('div', 'note-body', note.noteText)); // newlines preserved via CSS
+  box.appendChild(el('p', 'closing', 'Look closely. Leave gently. Light the way.'));
+  box.appendChild(el('p', 'sig', signature));
+  return box;
 }
 
 /* ---------------------------------------------------------------------------
    Journey Log block builder (separate block below the note)
+   Returns a DOM node; all user text set via textContent.
    --------------------------------------------------------------------------- */
 function renderJourney(finds) {
+  const box = el('div', 'journey');
+  box.appendChild(el('h3', null, 'The Journey Log'));
   const count = finds.length;
-  let html = '<div class="journey"><h3>The Journey Log</h3>';
   if (count === 0) {
-    html += '<p class="intro">You are the first person to find this sticker.</p>' +
-            '<p class="intro">Whatever you leave here, the next finder will read it.</p>';
+    box.appendChild(el('p', 'intro', 'You are the first person to find this sticker.'));
+    box.appendChild(el('p', 'intro', 'Whatever you leave here, the next finder will read it.'));
   } else {
-    html += '<p class="intro">This sticker has been found ' + count +
-            ' time' + (count === 1 ? '' : 's') + ' before you.</p>';
+    box.appendChild(el('p', 'intro',
+      'This sticker has been found ' + count + ' time' + (count === 1 ? '' : 's') + ' before you.'));
     finds.forEach(f => {
-      const who = f.unsigned ? 'A Finder' : esc(f.givenName);
-      const line = [who, esc(f.city), esc(f.date)].filter(Boolean).join(' · ');
-      html += '<div class="log-entry">' +
-                '<p class="who">' + line + '</p>' +
-                (f.message ? '<p class="msg">' + esc(f.message).replace(/\n/g, '<br>') + '</p>' : '') +
-              '</div>';
+      const who = f.unsigned ? 'A Finder' : f.givenName;
+      const line = [who, f.city, f.date].filter(Boolean).join(' · ');
+      const entry = el('div', 'log-entry');
+      entry.appendChild(el('p', 'who', line));
+      if (f.message) entry.appendChild(el('p', 'msg', f.message)); // newlines preserved via CSS
+      box.appendChild(entry);
     });
   }
-  html += '</div>';
-  return html;
+  return box;
 }
 
 /* ---------------------------------------------------------------------------
@@ -578,8 +584,13 @@ $('#find-form').addEventListener('submit', async (e) => {
 
   try {
     const res = await apiPost(payload);
-    if (!res || res.error) {
+    if (!res) {
       errEl.textContent = 'Something went wrong. The Keeper is aware. Try again in a moment.';
+      return;
+    }
+    if (res.error) {
+      // Backend returns user-safe messages (e.g. unrecognized Given Name).
+      errEl.textContent = res.error;
       return;
     }
 
@@ -620,8 +631,8 @@ function renderConfirmationNew(res, place) {
   $('#cn-name').textContent = res.givenName;
   $('#cn-place').textContent = [res.city, res.country].filter(Boolean).join(', ');
   $('#cn-date').textContent = res.date;
-  $('#cn-fieldnote').innerHTML = renderFieldNote(place.note, res.city, res.country);
-  $('#cn-journey').innerHTML = renderJourney(place.finds);
+  $('#cn-fieldnote').replaceChildren(renderFieldNote(place.note, res.city, res.country));
+  $('#cn-journey').replaceChildren(renderJourney(place.finds));
 }
 
 /* ---------------------------------------------------------------------------
@@ -640,8 +651,8 @@ function renderConfirmationReturning(res, place) {
     ? next.remaining + ' find' + (next.remaining === 1 ? '' : 's') + ' until ' + next.name + '.'
     : '';
 
-  $('#cr-fieldnote').innerHTML = renderFieldNote(place.note, res.city, res.country);
-  $('#cr-journey').innerHTML = renderJourney(place.finds);
+  $('#cr-fieldnote').replaceChildren(renderFieldNote(place.note, res.city, res.country));
+  $('#cr-journey').replaceChildren(renderJourney(place.finds));
 
   // Ferryman-only "leave a Field Note" control.
   const ferry = $('#cr-ferryman');
@@ -728,13 +739,20 @@ function renderLookup(res) {
   const trail = $('#lu-trail');
   const finds = res.findHistory || [];
   if (finds.length === 0) {
-    trail.innerHTML = '<p class="meta dim" style="color:var(--muted)">No finds logged yet.</p>';
+    const empty = el('p', 'meta dim', 'No finds logged yet.');
+    empty.style.color = 'var(--muted)';
+    trail.replaceChildren(empty);
   } else {
-    trail.innerHTML = finds.map(f => {
-      const place = [esc(f.city), esc(f.country)].filter(Boolean).join(', ');
-      return '<div class="line"><span class="code">' + esc(f.stickerCode) + '</span> · ' +
-             place + ' · <span class="dim">' + esc(f.date) + '</span></div>';
-    }).join('');
+    const frag = document.createDocumentFragment();
+    finds.forEach(f => {
+      const place = [f.city, f.country].filter(Boolean).join(', ');
+      const line = el('div', 'line');
+      line.appendChild(el('span', 'code', f.stickerCode)); // user text via textContent
+      line.appendChild(document.createTextNode(' · ' + place + ' · '));
+      line.appendChild(el('span', 'dim', f.date));
+      frag.appendChild(line);
+    });
+    trail.replaceChildren(frag);
   }
 
   // Remember who this is, so a subsequent new find attaches to them.
@@ -749,19 +767,11 @@ $('#lu-lognew').addEventListener('click', () => {
   show('landing');
 });
 
-/* ---------------------------------------------------------------------------
-   Identity banner on the landing form (returning finder logging a new find)
-   --------------------------------------------------------------------------- */
+/* Carry a looked-up finder's Given Name into the visible form field so a new
+   find attaches to them. The field is now visible and editable on the form. */
 function setIdentity(name) {
   $('#givenName').value = name || '';
-  if (name) {
-    $('#logging-as-name').textContent = name;
-    $('#logging-as').style.display = '';
-  } else {
-    $('#logging-as').style.display = 'none';
-  }
 }
-$('#clear-identity').addEventListener('click', () => setIdentity(''));
 
 /* Back-to-start links reset the form to a clean state. */
 $$('[data-home]').forEach(b => b.addEventListener('click', () => {
@@ -826,7 +836,9 @@ async function generateCard(ctx) {
     await document.fonts.ready;
   } catch (e) { /* fall back to system fonts */ }
 
+  // Wait for the seal image to finish loading; refuse to draw a sealless card.
   const seal = await loadSeal();
+  if (!seal) throw new Error('Seal image failed to load.');
 
   // Background
   g.fillStyle = '#FAFAF5';
@@ -838,9 +850,7 @@ async function generateCard(ctx) {
   let y = 200;
 
   // Seal 300x300
-  if (seal) {
-    g.drawImage(seal, cx - 150, y, 300, 300);
-  }
+  g.drawImage(seal, cx - 150, y, 300, 300);
   y += 300 + 60;
 
   // "THE GIVEN NAME" — Cormorant SC 48, letter-spacing 8
@@ -927,11 +937,13 @@ $$('[data-download-card]').forEach(btn => btn.addEventListener('click', async ()
     document.body.appendChild(a);
     a.click();
     a.remove();
+    btn.textContent = original;
   } catch (e) {
-    // silent — card is a bonus, not the point
+    // Font or seal wasn't ready — tell the user rather than emit a broken card.
+    btn.textContent = 'Try again';
+    setTimeout(() => { btn.textContent = original; }, 2000);
   } finally {
     btn.disabled = false;
-    btn.textContent = original;
   }
 }));
 
