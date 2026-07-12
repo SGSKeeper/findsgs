@@ -1,1 +1,931 @@
-Hello
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Second Glance Society for Serendipitous Discovery</title>
+<meta name="description" content="You found one of ours. Log your find with the Second Glance Society for Serendipitous Discovery.">
+<link rel="icon" href="./SGSLogo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@600&family=Cormorant:ital,wght@1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ======================================================================
+     SGS DESIGN SYSTEM
+     Background #FAFAF5 | Text #1A1A1A | Accent #7DD4C8 | Secondary #E8A838
+     Headings: Cormorant SC Semi-Bold | Body: Inter | Max width 600px, mobile first
+     ====================================================================== */
+  :root {
+    --bg: #FAFAF5;
+    --text: #1A1A1A;
+    --accent: #7DD4C8;
+    --secondary: #E8A838;
+    --muted: #8FA8A8;
+    --hairline: #E4E4DA;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 32px 22px 72px;
+  }
+
+  section { display: none; }
+  section.active { display: block; animation: fade .5s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .seal {
+    display: block;
+    margin: 8px auto 26px;
+    width: 180px;
+    height: auto;
+  }
+  .seal.small { width: 120px; margin-bottom: 22px; }
+
+  h1, h2, h3, .display {
+    font-family: 'Cormorant SC', 'Cormorant', serif;
+    font-weight: 600;
+    letter-spacing: .5px;
+    line-height: 1.15;
+    margin: 0 0 .5em;
+  }
+
+  .lede { font-size: 1.28rem; line-height: 1.35; }
+  .lede.first { margin-top: 0; }
+
+  p { margin: 0 0 1.1em; }
+
+  .given-name {
+    font-family: 'Cormorant SC', 'Cormorant', serif;
+    font-weight: 600;
+    color: var(--accent);
+    font-size: 2.9rem;
+    line-height: 1.05;
+    letter-spacing: 1px;
+    margin: .1em 0 .15em;
+  }
+
+  .meta { color: var(--text); font-size: .98rem; }
+  .meta .dim { color: var(--muted); }
+
+  .rule {
+    border: none;
+    border-top: 1px solid var(--hairline);
+    margin: 34px 0;
+  }
+  .rule.accent { border-top: 2px solid var(--secondary); width: 200px; margin-left: 0; }
+
+  /* -------- Form -------- */
+  label { display: block; font-weight: 600; font-size: .9rem; margin: 0 0 6px; }
+  input[type="text"], textarea {
+    width: 100%;
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--text);
+    background: #fff;
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    padding: 13px 14px;
+    margin-bottom: 6px;
+  }
+  input[type="text"]:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(125, 212, 200, .25);
+  }
+  textarea { min-height: 96px; resize: vertical; }
+  .field { margin-bottom: 18px; }
+  .helper { font-size: .82rem; color: var(--muted); line-height: 1.4; margin: 2px 0 0; }
+
+  button, .btn {
+    display: inline-block;
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    font-size: .92rem;
+    text-transform: uppercase;
+    color: #10403B;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: transform .08s ease, filter .15s ease;
+  }
+  button:hover, .btn:hover { filter: brightness(1.04); }
+  button:active { transform: translateY(1px); }
+  button:disabled { opacity: .6; cursor: default; }
+
+  button.ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--hairline);
+  }
+  button.secondary { background: var(--secondary); color: #3A2A05; }
+  .btn-row { display: flex; gap: 12px; margin-top: 12px; }
+  .btn-row button { margin: 0; }
+
+  /* -------- Field Note block (visually distinct) -------- */
+  .fieldnote {
+    background: #fff;
+    border: 1px solid var(--hairline);
+    border-left: 4px solid var(--secondary);
+    border-radius: 12px;
+    padding: 22px 22px 20px;
+    margin: 26px 0;
+  }
+  .fieldnote .kicker {
+    font-family: 'Cormorant SC', serif;
+    font-weight: 600;
+    font-size: 1.4rem;
+    margin: 0 0 2px;
+  }
+  .fieldnote .place { color: var(--muted); font-size: .9rem; margin: 0 0 14px; }
+  .fieldnote .note-body { font-size: 1.05rem; line-height: 1.55; }
+  .fieldnote .closing { font-style: italic; color: var(--text); margin: 16px 0 4px; font-family: 'Cormorant', serif; font-size: 1.1rem; }
+  .fieldnote .sig { color: var(--muted); font-size: .9rem; margin: 0; }
+
+  /* -------- Journey Log block (separate) -------- */
+  .journey { margin: 26px 0; }
+  .journey h3 { font-size: 1.5rem; }
+  .journey .intro { color: var(--text); }
+  .log-entry {
+    border-top: 1px solid var(--hairline);
+    padding: 14px 0 4px;
+  }
+  .log-entry .who { font-size: .84rem; color: var(--muted); margin: 0 0 4px; }
+  .log-entry .msg { margin: 0 0 6px; }
+
+  /* -------- Lookup / history list -------- */
+  .trail { margin: 8px 0 24px; }
+  .trail .line {
+    border-top: 1px solid var(--hairline);
+    padding: 11px 0;
+    font-size: .96rem;
+  }
+  .trail .line .code { font-weight: 600; }
+  .trail .line .dim { color: var(--muted); }
+
+  /* -------- Ferryman note control (quiet) -------- */
+  .ferryman {
+    margin: 30px 0 0;
+    padding: 18px 20px;
+    border: 1px dashed var(--accent);
+    border-radius: 12px;
+    background: rgba(125, 212, 200, .06);
+  }
+  .ferryman p { margin: 0 0 12px; font-size: .95rem; }
+  .ferryman .prompt { font-family: 'Cormorant', serif; font-style: italic; font-size: 1.05rem; }
+
+  .textlink {
+    display: inline-block;
+    background: none;
+    border: none;
+    width: auto;
+    padding: 0;
+    margin: 8px 0 0;
+    color: var(--accent);
+    font-weight: 600;
+    letter-spacing: .3px;
+    text-transform: none;
+    font-size: .95rem;
+    cursor: pointer;
+  }
+  .textlink:hover { text-decoration: underline; filter: none; }
+
+  .banner {
+    background: rgba(125, 212, 200, .14);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: .9rem;
+    margin-bottom: 18px;
+  }
+  .banner .name { font-weight: 600; }
+
+  .error-msg {
+    color: #8a2b2b;
+    font-size: .92rem;
+    margin: 10px 0 0;
+    min-height: 1.2em;
+  }
+
+  .divider-label {
+    text-align: center;
+    color: var(--muted);
+    font-size: .85rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 8px 0 14px;
+  }
+
+  .foot {
+    margin-top: 44px;
+    padding-top: 20px;
+    border-top: 1px solid var(--hairline);
+    font-size: .8rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .closing-verse { text-align: center; color: var(--muted); font-family: 'Cormorant', serif; font-size: 1.15rem; line-height: 1.5; margin: 30px 0 0; }
+
+  .spinner { text-align: center; color: var(--muted); padding: 30px 0; font-family: 'Cormorant', serif; font-size: 1.2rem; }
+
+  canvas { display: none; }
+</style>
+
+<div class="wrap">
+
+  <!-- ================= LANDING ================= -->
+  <section id="landing" class="active">
+    <img class="seal" src="./SGSLogo.png" alt="The seal of the Second Glance Society">
+
+    <p class="lede first">You weren’t supposed to find this.</p>
+    <p class="lede">And yet.</p>
+
+    <p>That sticker belongs to the Second Glance Society for Serendipitous Discovery — a global society of people who look twice, leave something behind, and light the way for whoever comes next.</p>
+    <p>You found one of ours. That means something.</p>
+    <p>Log your find below. It takes two minutes. On the other side, the Keeper has something to say about where you are.</p>
+
+    <hr class="rule">
+
+    <div id="logging-as" class="banner" style="display:none;">
+      Logging this find as <span class="name" id="logging-as-name"></span>.
+      <button type="button" class="textlink" id="clear-identity">Not you? Log as someone new</button>
+    </div>
+
+    <form id="find-form" novalidate>
+      <div class="field">
+        <label for="stickerCode">Sticker code</label>
+        <input type="text" id="stickerCode" name="stickerCode" required placeholder="e.g. SR-001" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="city">City</label>
+        <input type="text" id="city" name="city" required placeholder="City" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="country">Country</label>
+        <input type="text" id="country" name="country" required placeholder="Country" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="message">A note for the next finder <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <textarea id="message" name="message" placeholder="They’ll read this someday"></textarea>
+        <p class="helper">Keep it about the place, not about you — Field Notes are public. Please don’t include your full name, school, address, or any other personal details.</p>
+      </div>
+      <div class="field">
+        <label for="nameHandle">Sign it <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <input type="text" id="nameHandle" name="nameHandle" placeholder="Leave blank to remain anonymous" autocomplete="off">
+        <p class="helper">Leave blank to remain anonymous, or use a nickname. If you’re a Junior Finder, please don’t use your full name.</p>
+      </div>
+      <input type="hidden" id="givenName" name="givenName" value="">
+      <button type="submit" id="log-btn">Log my find</button>
+      <p class="error-msg" id="find-error"></p>
+    </form>
+
+    <hr class="rule">
+
+    <p class="divider-label">Already a member?</p>
+    <div class="field">
+      <input type="text" id="returningName" placeholder="Your Given Name e.g. Quiet Tide" autocomplete="off">
+    </div>
+    <button type="button" class="ghost" id="return-btn">Return</button>
+    <p class="error-msg" id="return-error"></p>
+
+    <div class="foot">
+      A note for grown-ups: findsgs.com never asks for accounts, passwords, or email addresses. Junior Finders are encouraged to log finds with a parent or guardian nearby, especially in new places.
+    </div>
+  </section>
+
+  <!-- ================= FIRST-TIME CONFIRMATION ================= -->
+  <section id="confirmation-new">
+    <img class="seal small" src="./SGSLogo.png" alt="The seal of the Second Glance Society">
+
+    <h1>Find logged.</h1>
+    <p>Sticker <strong id="cn-sticker"></strong> has been recorded. Its journey continues.</p>
+    <p>The Keeper has been watching. The Keeper has something for you.</p>
+
+    <hr class="rule">
+
+    <p class="meta">Your Given Name is:</p>
+    <div class="given-name" id="cn-name"></div>
+    <p class="meta">Finder · <span id="cn-place"></span> · <span id="cn-date"></span></p>
+
+    <p style="margin-top:18px;">Your Given Name is yours permanently. It is how the portal knows you across every find, every city, every year. Save it somewhere you will find it again — a note on your phone, written inside the cover of a journal.</p>
+    <p><strong>The portal has no password recovery. Your Given Name is how you return.</strong></p>
+
+    <button type="button" class="secondary" data-download-card>Download your Given Name card</button>
+    <div class="btn-row">
+      <button type="button" class="ghost" data-share>Share</button>
+    </div>
+
+    <div id="cn-fieldnote"></div>
+    <div id="cn-journey"></div>
+
+    <p class="closing-verse">
+      The Society has no app. No algorithm. No feed to scroll.<br>
+      It lives in the world, in the places most people walk past.<br>
+      You didn’t walk past.<br>
+      <strong style="color:var(--text)">Welcome, Finder.</strong>
+    </p>
+
+    <button type="button" class="textlink" data-home>← Back to the start</button>
+  </section>
+
+  <!-- ================= RETURNING CONFIRMATION ================= -->
+  <section id="confirmation-returning">
+    <img class="seal small" src="./SGSLogo.png" alt="The seal of the Second Glance Society">
+
+    <h1>Welcome back, <span id="cr-name"></span>.</h1>
+    <p class="meta">Find logged — <strong id="cr-sticker"></strong> · <span id="cr-place"></span> · <span id="cr-date"></span></p>
+    <p style="margin-top:6px;"><span id="cr-total"></span> finds logged. Rank: <strong id="cr-rank"></strong>.</p>
+    <p id="cr-next" class="meta dim" style="color:var(--muted);"></p>
+
+    <div class="btn-row" style="margin-top:16px;">
+      <button type="button" class="secondary" data-download-card>Download card</button>
+      <button type="button" class="ghost" data-share>Share</button>
+    </div>
+
+    <div id="cr-fieldnote"></div>
+    <div id="cr-journey"></div>
+
+    <!-- Ferryman-only field-note control (quiet, invitational) -->
+    <div class="ferryman" id="cr-ferryman" style="display:none;">
+      <p class="prompt">Did you place this sticker? Leave a Field Note for whoever finds it next.</p>
+      <textarea id="ferryman-note" placeholder="Under the third tile from the left, where the moss starts…"></textarea>
+      <button type="button" data-submit-note>Submit note</button>
+      <p class="error-msg" id="ferryman-error"></p>
+      <p id="ferryman-done" style="display:none; font-family:'Cormorant',serif; font-style:italic; color:var(--muted); margin:12px 0 0;">Your note has been sent to the Keeper. One does wonder.</p>
+    </div>
+
+    <button type="button" class="textlink" data-home>← Back to the start</button>
+  </section>
+
+  <!-- ================= LOOKUP RESULT ================= -->
+  <section id="lookup-result">
+    <img class="seal small" src="./SGSLogo.png" alt="The seal of the Second Glance Society">
+
+    <h1>Welcome back, <span id="lu-name"></span>.</h1>
+    <p><span id="lu-total"></span> finds logged. Rank: <strong id="lu-rank"></strong>.</p>
+    <p id="lu-next" class="meta dim" style="color:var(--muted);"></p>
+
+    <h3 style="margin-top:26px;">Your finds:</h3>
+    <div class="trail" id="lu-trail"></div>
+
+    <button type="button" class="textlink" id="lu-lognew">Log a new find ↑</button>
+  </section>
+
+  <!-- ================= PROMOTION — FATHOMER ================= -->
+  <section id="promotion-fathomer">
+    <img class="seal small" src="./SGSLogo.png" alt="The seal of the Second Glance Society">
+    <h1>Welcome back, <span class="promo-name"></span>.</h1>
+    <p class="lede">Something has changed.</p>
+    <p>You have logged 10 finds. The Keeper has taken note.</p>
+    <p>You are no longer a Finder.</p>
+    <p class="given-name" style="font-size:2.4rem;">You are a Fathomer.</p>
+    <p>To fathom something is to understand its depth.</p>
+    <p>You have begun to understand.</p>
+    <button type="button" data-continue>Continue</button>
+  </section>
+
+  <!-- ================= PROMOTION — FERRYMAN ================= -->
+  <section id="promotion-ferryman">
+    <img class="seal small" src="./SGSLogo.png" alt="The seal of the Second Glance Society">
+    <h1>Welcome back, <span class="promo-name"></span>.</h1>
+    <p class="lede">Fifty finds.</p>
+    <p>The Keeper has been watching for a long time.</p>
+    <p class="given-name" style="font-size:2.4rem;">You are a Ferryman now.</p>
+    <p>You know what that means.</p>
+    <p>You lead others to wonder.</p>
+    <p style="font-family:'Cormorant',serif; font-style:italic; font-size:1.2rem;">One does wonder what comes next.</p>
+    <button type="button" data-continue>Continue</button>
+  </section>
+
+</div>
+
+<canvas id="card-canvas" width="1080" height="1920"></canvas>
+
+<script>
+/* ============================================================================
+   >>> PASTE YOUR APPS SCRIPT WEB APP URL BETWEEN THE QUOTES BELOW <<<
+   This is the ONLY line Dani needs to edit. Deploy code.gs as a Web App
+   (Execute as: Me · Who has access: Anyone), copy the /exec URL, paste here.
+   ============================================================================ */
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxDPpqGQHNU-GzP-muNMWX5mMq534ZKdhzaQUYwPqYR_K95OVGxKR-aJoce9-AIn6zIPQ/exec';
+
+/* ---------------------------------------------------------------------------
+   Ranks / thresholds (mirrors code.gs for frontend "finds until next" text)
+   --------------------------------------------------------------------------- */
+const FATHOMER_AT = 10;
+const FERRYMAN_AT = 50;
+
+function nextRankInfo(totalFinds, rank) {
+  if (rank === 'Ferryman') return null;
+  if (totalFinds < FATHOMER_AT) return { name: 'Fathomer', remaining: FATHOMER_AT - totalFinds };
+  if (totalFinds < FERRYMAN_AT) return { name: 'Ferryman', remaining: FERRYMAN_AT - totalFinds };
+  return null;
+}
+
+/* ---------------------------------------------------------------------------
+   Small helpers
+   --------------------------------------------------------------------------- */
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+));
+
+function show(id) {
+  $$('section').forEach(s => s.classList.remove('active'));
+  $('#' + id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function apiGet(params) {
+  const qs = new URLSearchParams(params).toString();
+  const res = await fetch(WEB_APP_URL + '?' + qs, { method: 'GET' });
+  return res.json();
+}
+
+async function apiPost(payload) {
+  // Plain-text body avoids a CORS preflight (Apps Script can't answer OPTIONS).
+  const res = await fetch(WEB_APP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  });
+  return res.json();
+}
+
+/* Holds the most recent find, so the card + share buttons can read it. */
+let lastContext = null;
+
+/* ---------------------------------------------------------------------------
+   Field Note block builder (visually distinct — the Keeper's note about place)
+   --------------------------------------------------------------------------- */
+function renderFieldNote(note, city, country) {
+  const isFerrymanAuthored = note.source === 'sticker' &&
+    note.writtenBy && note.writtenBy.toLowerCase() !== 'keeper';
+  const header = isFerrymanAuthored
+    ? 'Field Notes from ' + esc(note.writtenBy) + ', Ferryman'
+    : 'Field Notes from the Keeper';
+  const signature = isFerrymanAuthored
+    ? '— ' + esc(note.writtenBy) + ', Ferryman'
+    : '— The Keeper';
+  const place = [city, country].filter(Boolean).map(esc).join(', ');
+
+  return '' +
+    '<div class="fieldnote">' +
+      '<div class="kicker">' + header + '</div>' +
+      (place ? '<div class="place">' + place + '</div>' : '') +
+      '<div class="note-body">' + esc(note.noteText).replace(/\n/g, '<br>') + '</div>' +
+      '<p class="closing">Look closely. Leave gently. Light the way.</p>' +
+      '<p class="sig">' + signature + '</p>' +
+    '</div>';
+}
+
+/* ---------------------------------------------------------------------------
+   Journey Log block builder (separate block below the note)
+   --------------------------------------------------------------------------- */
+function renderJourney(finds) {
+  const count = finds.length;
+  let html = '<div class="journey"><h3>The Journey Log</h3>';
+  if (count === 0) {
+    html += '<p class="intro">You are the first person to find this sticker.</p>' +
+            '<p class="intro">Whatever you leave here, the next finder will read it.</p>';
+  } else {
+    html += '<p class="intro">This sticker has been found ' + count +
+            ' time' + (count === 1 ? '' : 's') + ' before you.</p>';
+    finds.forEach(f => {
+      const who = (f.nameHandle && f.nameHandle.trim()) ? esc(f.nameHandle) : 'Anonymous';
+      const line = [who, esc(f.city), esc(f.date)].filter(Boolean).join(' · ');
+      html += '<div class="log-entry">' +
+                '<p class="who">' + line + '</p>' +
+                (f.message ? '<p class="msg">' + esc(f.message).replace(/\n/g, '<br>') + '</p>' : '') +
+              '</div>';
+    });
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ---------------------------------------------------------------------------
+   Fetch the Field Note + Journey Log for a find (in parallel).
+   --------------------------------------------------------------------------- */
+async function fetchPlaceContext(stickerCode, city, country) {
+  const [note, journey] = await Promise.all([
+    apiGet({ action: 'getFieldNote', stickerCode, city, country }),
+    apiGet({ action: 'getStickerJourney', stickerCode })
+  ]);
+  return { note, finds: (journey && journey.finds) || [] };
+}
+
+/* ---------------------------------------------------------------------------
+   LOG A FIND
+   --------------------------------------------------------------------------- */
+$('#find-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = $('#log-btn');
+  const errEl = $('#find-error');
+  errEl.textContent = '';
+
+  const payload = {
+    action: 'logFind',
+    stickerCode: $('#stickerCode').value.trim(),
+    city: $('#city').value.trim(),
+    country: $('#country').value.trim(),
+    message: $('#message').value.trim(),
+    nameHandle: $('#nameHandle').value.trim(),
+    givenName: $('#givenName').value.trim()
+  };
+
+  if (!payload.stickerCode || !payload.city || !payload.country) {
+    errEl.textContent = 'Please fill in the sticker code, city, and country.';
+    return;
+  }
+
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = 'Logging…';
+
+  try {
+    const res = await apiPost(payload);
+    if (!res || res.error) {
+      errEl.textContent = 'Something went wrong. The Keeper is aware. Try again in a moment.';
+      return;
+    }
+
+    const place = await fetchPlaceContext(res.stickerCode, res.city, res.country);
+    lastContext = { res, place };
+
+    if (res.isNewFinder) {
+      renderConfirmationNew(res, place);
+      show('confirmation-new');
+    } else {
+      renderConfirmationReturning(res, place);
+      if (res.rankJustChanged && res.newRank === 'Fathomer') {
+        $$('#promotion-fathomer .promo-name').forEach(n => n.textContent = res.givenName);
+        show('promotion-fathomer');
+      } else if (res.rankJustChanged && res.newRank === 'Ferryman') {
+        $$('#promotion-ferryman .promo-name').forEach(n => n.textContent = res.givenName);
+        show('promotion-ferryman');
+      } else {
+        show('confirmation-returning');
+      }
+    }
+  } catch (err) {
+    errEl.textContent = 'Something went wrong. The Keeper is aware. Try again in a moment.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+});
+
+/* Promotion "Continue" buttons -> the returning confirmation. */
+$$('[data-continue]').forEach(b => b.addEventListener('click', () => show('confirmation-returning')));
+
+/* ---------------------------------------------------------------------------
+   Render: first-time confirmation
+   --------------------------------------------------------------------------- */
+function renderConfirmationNew(res, place) {
+  $('#cn-sticker').textContent = res.stickerCode;
+  $('#cn-name').textContent = res.givenName;
+  $('#cn-place').textContent = [res.city, res.country].filter(Boolean).join(', ');
+  $('#cn-date').textContent = res.date;
+  $('#cn-fieldnote').innerHTML = renderFieldNote(place.note, res.city, res.country);
+  $('#cn-journey').innerHTML = renderJourney(place.finds);
+}
+
+/* ---------------------------------------------------------------------------
+   Render: returning confirmation
+   --------------------------------------------------------------------------- */
+function renderConfirmationReturning(res, place) {
+  $('#cr-name').textContent = res.givenName;
+  $('#cr-sticker').textContent = res.stickerCode;
+  $('#cr-place').textContent = [res.city, res.country].filter(Boolean).join(', ');
+  $('#cr-date').textContent = res.date;
+  $('#cr-total').textContent = res.totalFinds;
+  $('#cr-rank').textContent = res.rank;
+
+  const next = nextRankInfo(res.totalFinds, res.rank);
+  $('#cr-next').textContent = next
+    ? next.remaining + ' find' + (next.remaining === 1 ? '' : 's') + ' until ' + next.name + '.'
+    : '';
+
+  $('#cr-fieldnote').innerHTML = renderFieldNote(place.note, res.city, res.country);
+  $('#cr-journey').innerHTML = renderJourney(place.finds);
+
+  // Ferryman-only "leave a Field Note" control.
+  const ferry = $('#cr-ferryman');
+  if (res.isFerryman) {
+    ferry.style.display = '';
+    $('#ferryman-note').value = '';
+    $('#ferryman-error').textContent = '';
+    $('#ferryman-done').style.display = 'none';
+    $('[data-submit-note]').style.display = '';
+  } else {
+    ferry.style.display = 'none';
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Ferryman submits a sticker Field Note
+   --------------------------------------------------------------------------- */
+$('[data-submit-note]').addEventListener('click', async () => {
+  const errEl = $('#ferryman-error');
+  errEl.textContent = '';
+  const noteText = $('#ferryman-note').value.trim();
+  if (!noteText) { errEl.textContent = 'Write a note first.'; return; }
+  if (!lastContext) return;
+
+  try {
+    const res = await apiPost({
+      action: 'submitStickerNote',
+      stickerCode: lastContext.res.stickerCode,
+      noteText,
+      givenName: lastContext.res.givenName
+    });
+    if (res && res.success) {
+      $('[data-submit-note]').style.display = 'none';
+      $('#ferryman-note').style.display = 'none';
+      $('#ferryman-done').style.display = '';
+    } else {
+      errEl.textContent = 'Something went wrong. The Keeper is aware. Try again in a moment.';
+    }
+  } catch (err) {
+    errEl.textContent = 'Something went wrong. The Keeper is aware. Try again in a moment.';
+  }
+});
+
+/* ---------------------------------------------------------------------------
+   RETURNING FINDER LOOKUP (without logging a find)
+   --------------------------------------------------------------------------- */
+$('#return-btn').addEventListener('click', async () => {
+  const errEl = $('#return-error');
+  errEl.textContent = '';
+  const name = $('#returningName').value.trim();
+  if (!name) { errEl.textContent = 'Enter your Given Name.'; return; }
+
+  const btn = $('#return-btn');
+  btn.disabled = true;
+  try {
+    const res = await apiGet({ action: 'lookupFinder', givenName: name });
+    if (!res || res.error) {
+      errEl.textContent = 'Something went wrong. The Keeper is aware. Try again in a moment.';
+      return;
+    }
+    if (!res.found) {
+      errEl.textContent = 'The Keeper doesn’t recognize that name. Check the spelling and try again.';
+      return;
+    }
+    renderLookup(res);
+    show('lookup-result');
+  } catch (err) {
+    errEl.textContent = 'Something went wrong. The Keeper is aware. Try again in a moment.';
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+function renderLookup(res) {
+  $('#lu-name').textContent = res.givenName;
+  $('#lu-total').textContent = res.totalFinds;
+  $('#lu-rank').textContent = res.rank;
+
+  const next = nextRankInfo(res.totalFinds, res.rank);
+  $('#lu-next').textContent = next
+    ? next.remaining + ' find' + (next.remaining === 1 ? '' : 's') + ' until ' + next.name + '.'
+    : '';
+
+  const trail = $('#lu-trail');
+  const finds = res.findHistory || [];
+  if (finds.length === 0) {
+    trail.innerHTML = '<p class="meta dim" style="color:var(--muted)">No finds logged yet.</p>';
+  } else {
+    trail.innerHTML = finds.map(f => {
+      const place = [esc(f.city), esc(f.country)].filter(Boolean).join(', ');
+      return '<div class="line"><span class="code">' + esc(f.stickerCode) + '</span> · ' +
+             place + ' · <span class="dim">' + esc(f.date) + '</span></div>';
+    }).join('');
+  }
+
+  // Remember who this is, so a subsequent new find attaches to them.
+  lookedUpName = res.givenName;
+}
+
+let lookedUpName = '';
+
+/* "Log a new find ↑" — carry the identity back to the landing form. */
+$('#lu-lognew').addEventListener('click', () => {
+  setIdentity(lookedUpName);
+  show('landing');
+});
+
+/* ---------------------------------------------------------------------------
+   Identity banner on the landing form (returning finder logging a new find)
+   --------------------------------------------------------------------------- */
+function setIdentity(name) {
+  $('#givenName').value = name || '';
+  if (name) {
+    $('#logging-as-name').textContent = name;
+    $('#logging-as').style.display = '';
+  } else {
+    $('#logging-as').style.display = 'none';
+  }
+}
+$('#clear-identity').addEventListener('click', () => setIdentity(''));
+
+/* Back-to-start links reset the form to a clean state. */
+$$('[data-home]').forEach(b => b.addEventListener('click', () => {
+  setIdentity('');
+  $('#find-form').reset();
+  $('#find-error').textContent = '';
+  show('landing');
+}));
+
+/* ---------------------------------------------------------------------------
+   SHARE (Web Share API with clipboard fallback)
+   --------------------------------------------------------------------------- */
+$$('[data-share]').forEach(btn => btn.addEventListener('click', async () => {
+  if (!lastContext) return;
+  const name = lastContext.res.givenName;
+  const shareData = {
+    title: 'Second Glance Society',
+    text: 'I found one of theirs. My Given Name is ' + name + '.',
+    url: 'https://findsgs.com'
+  };
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData);
+    } else {
+      await navigator.clipboard.writeText(shareData.text + ' ' + shareData.url);
+      const original = btn.textContent;
+      btn.textContent = 'Copied ✓';
+      setTimeout(() => { btn.textContent = original; }, 1800);
+    }
+  } catch (err) { /* user cancelled — nothing to do */ }
+}));
+
+/* ---------------------------------------------------------------------------
+   GIVEN NAME CARD — client-side Canvas -> PNG (1080 x 1920, IG Stories)
+   --------------------------------------------------------------------------- */
+let sealImage = null;
+function loadSeal() {
+  if (sealImage) return Promise.resolve(sealImage);
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => { sealImage = img; resolve(img); };
+    img.onerror = () => resolve(null);
+    img.src = './SGSLogo.png';
+  });
+}
+
+async function generateCard(ctx) {
+  const canvas = $('#card-canvas');
+  const g = canvas.getContext('2d');
+  const W = canvas.width; // 1080
+  const cx = W / 2;
+
+  // Make sure fonts are ready before we paint text.
+  try {
+    await Promise.all([
+      document.fonts.load('600 120px "Cormorant SC"'),
+      document.fonts.load('600 48px "Cormorant SC"'),
+      document.fonts.load('italic 500 40px "Cormorant"'),
+      document.fonts.load('400 36px "Inter"'),
+      document.fonts.load('600 36px "Inter"')
+    ]);
+    await document.fonts.ready;
+  } catch (e) { /* fall back to system fonts */ }
+
+  const seal = await loadSeal();
+
+  // Background
+  g.fillStyle = '#FAFAF5';
+  g.fillRect(0, 0, W, canvas.height);
+
+  g.textAlign = 'center';
+  g.textBaseline = 'top';
+
+  let y = 200;
+
+  // Seal 300x300
+  if (seal) {
+    g.drawImage(seal, cx - 150, y, 300, 300);
+  }
+  y += 300 + 60;
+
+  // "THE GIVEN NAME" — Cormorant SC 48, letter-spacing 8
+  g.fillStyle = '#1A1A1A';
+  g.font = '600 48px "Cormorant SC", serif';
+  drawSpaced(g, 'THE GIVEN NAME', cx, y, 8);
+  y += 48 + 40;
+
+  // Given name — Cormorant SC 120 turquoise
+  g.fillStyle = '#7DD4C8';
+  g.font = '600 120px "Cormorant SC", serif';
+  g.fillText(ctx.givenName, cx, y);
+  y += 120 + 40;
+
+  // rank · city, country — Inter 36
+  g.fillStyle = '#1A1A1A';
+  g.font = '400 36px "Inter", sans-serif';
+  const line1 = ctx.rank + ' · ' + [ctx.city, ctx.country].filter(Boolean).join(', ');
+  g.fillText(line1, cx, y);
+  y += 36 + 12;
+
+  // date — Inter 36 muted
+  g.fillStyle = '#8FA8A8';
+  g.fillText(ctx.date, cx, y);
+  y += 36 + 80;
+
+  // Horizontal rule 200 wide, #E8A838, 2px
+  g.strokeStyle = '#E8A838';
+  g.lineWidth = 2;
+  g.beginPath();
+  g.moveTo(cx - 100, y);
+  g.lineTo(cx + 100, y);
+  g.stroke();
+  y += 60;
+
+  // Motto — Cormorant italic 40
+  g.fillStyle = '#1A1A1A';
+  g.font = 'italic 500 40px "Cormorant", serif';
+  g.fillText('Look closely. Leave gently. Light the way.', cx, y);
+  y += 40 + 40;
+
+  // findsgs.com — Inter 32 turquoise
+  g.fillStyle = '#7DD4C8';
+  g.font = '400 32px "Inter", sans-serif';
+  g.fillText('findsgs.com', cx, y);
+
+  return canvas;
+}
+
+/* Letter-spaced centered text helper for canvas. */
+function drawSpaced(g, text, centerX, y, spacing) {
+  const chars = text.split('');
+  const widths = chars.map(c => g.measureText(c).width + spacing);
+  const total = widths.reduce((a, b) => a + b, 0) - spacing;
+  let x = centerX - total / 2;
+  const prevAlign = g.textAlign;
+  g.textAlign = 'left';
+  chars.forEach((c, i) => {
+    g.fillText(c, x, y);
+    x += widths[i];
+  });
+  g.textAlign = prevAlign;
+}
+
+$$('[data-download-card]').forEach(btn => btn.addEventListener('click', async () => {
+  if (!lastContext) return;
+  const r = lastContext.res;
+  const ctx = {
+    givenName: r.givenName,
+    rank: r.rank || 'Finder',
+    city: r.city,
+    country: r.country,
+    date: r.date
+  };
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Drawing…';
+  try {
+    const canvas = await generateCard(ctx);
+    const url = canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'SGS-' + ctx.givenName.replace(/\s+/g, '-') + '.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } catch (e) {
+    // silent — card is a bonus, not the point
+  } finally {
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+}));
+
+/* ---------------------------------------------------------------------------
+   Prefill the sticker code from the QR URL if present
+   (?code=SR-001 or ?sticker=SR-001 — harmless if absent)
+   --------------------------------------------------------------------------- */
+(function prefillFromUrl() {
+  const p = new URLSearchParams(window.location.search);
+  const code = p.get('code') || p.get('sticker') || p.get('s');
+  if (code) $('#stickerCode').value = code.trim();
+})();
+</script>
