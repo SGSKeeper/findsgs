@@ -107,6 +107,23 @@
   textarea { min-height: 96px; resize: vertical; }
   .field { margin-bottom: 18px; }
   .helper { font-size: .82rem; color: var(--muted); line-height: 1.4; margin: 2px 0 0; }
+  .check-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-weight: 400;
+    font-size: .88rem;
+    color: var(--text);
+    margin: 12px 0 0;
+    cursor: pointer;
+  }
+  .check-row input[type="checkbox"] {
+    width: 18px; height: 18px;
+    margin: 2px 0 0;
+    accent-color: var(--accent);
+    flex: 0 0 auto;
+    cursor: pointer;
+  }
 
   button, .btn {
     display: inline-block;
@@ -284,11 +301,10 @@
         <label for="message">A note for the next finder <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
         <textarea id="message" name="message" placeholder="They’ll read this someday"></textarea>
         <p class="helper">Keep it about the place, not about you — Field Notes are public. Please don’t include your full name, school, address, or any other personal details.</p>
-      </div>
-      <div class="field">
-        <label for="nameHandle">Sign it <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
-        <input type="text" id="nameHandle" name="nameHandle" placeholder="Leave blank to remain anonymous" autocomplete="off">
-        <p class="helper">Leave blank to remain anonymous, or use a nickname. If you’re a Junior Finder, please don’t use your full name.</p>
+        <label class="check-row">
+          <input type="checkbox" id="unsigned" name="unsigned">
+          <span>Post this unsigned — show it as “A Finder” instead of my Given Name.</span>
+        </label>
       </div>
       <input type="hidden" id="givenName" name="givenName" value="">
       <button type="submit" id="log-btn">Log my find</button>
@@ -509,7 +525,7 @@ function renderJourney(finds) {
     html += '<p class="intro">This sticker has been found ' + count +
             ' time' + (count === 1 ? '' : 's') + ' before you.</p>';
     finds.forEach(f => {
-      const who = (f.nameHandle && f.nameHandle.trim()) ? esc(f.nameHandle) : 'Anonymous';
+      const who = f.unsigned ? 'A Finder' : esc(f.givenName);
       const line = [who, esc(f.city), esc(f.date)].filter(Boolean).join(' · ');
       html += '<div class="log-entry">' +
                 '<p class="who">' + line + '</p>' +
@@ -547,7 +563,7 @@ $('#find-form').addEventListener('submit', async (e) => {
     city: $('#city').value.trim(),
     country: $('#country').value.trim(),
     message: $('#message').value.trim(),
-    nameHandle: $('#nameHandle').value.trim(),
+    unsigned: $('#unsigned').checked,
     givenName: $('#givenName').value.trim()
   };
 
